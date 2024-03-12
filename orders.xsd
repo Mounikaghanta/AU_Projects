@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+
+    <!-- Custom Simple Types -->
+    <xs:simpleType name="saleItemType">
+        <xs:restriction base="xs:string">
+            <xs:enumeration value="Y"/>
+            <xs:enumeration value="N"/>
+        </xs:restriction>
+    </xs:simpleType>
+
+    <xs:simpleType name="orderIDType">
+        <xs:restriction base="xs:string">
+            <xs:pattern value="or\d{4}"/>
+        </xs:restriction>
+    </xs:simpleType>
+
+    <xs:simpleType name="orderByType">
+        <xs:restriction base="xs:string">
+            <xs:pattern value="cust\d{3}"/>
+        </xs:restriction>
+    </xs:simpleType>
+
+    <xs:simpleType name="custIdType">
+        <xs:restriction base="xs:string">
+            <xs:pattern value="cust\d{3}"/>
+        </xs:restriction>
+    </xs:simpleType>
+
+    <xs:simpleType name="titleType">
+        <xs:restriction base="xs:string">
+            <xs:enumeration value="Mr."/>
+            <xs:enumeration value="Ms."/>
+            <xs:enumeration value="Mrs."/>
+        </xs:restriction>
+    </xs:simpleType>
+
+    <!-- Simple Elements -->
+    <xs:element name="itemQty" type="xs:integer"/>
+    <xs:element name="orderDate" type="xs:date"/>
+    <xs:element name="email" type="xs:string"/>
+    <xs:element name="phone" type="xs:string"/>
+    <xs:element name="address" type="xs:string"/>
+
+    <!-- Complex Elements -->
+    <xs:element name="itemPrice">
+        <xs:complexType>
+            <xs:simpleContent>
+                <xs:extension base="xs:decimal">
+                    <xs:attribute name="saleItem" type="saleItemType" use="optional"/>
+                </xs:extension>
+            </xs:simpleContent>
+        </xs:complexType>
+    </xs:element>
+
+    <!-- Complex Type for 'item' -->
+    <xs:complexType name="ItemType">
+        <xs:sequence>
+            <xs:element ref="itemPrice"/>
+            <xs:element ref="itemQty"/>
+        </xs:sequence>
+        <xs:attribute name="itemNumber" type="xs:string" use="required"/>
+    </xs:complexType>
+
+    <!-- Complex Type for 'items' -->
+    <xs:complexType name="ItemsType">
+        <xs:sequence>
+            <xs:element name="item" type="ItemType" minOccurs="1" maxOccurs="unbounded"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <!-- Complex Type for 'order' -->
+    <xs:complexType name="OrderType">
+        <xs:sequence>
+            <xs:element ref="orderDate"/>
+            <xs:element name="items" type="ItemsType"/>
+        </xs:sequence>
+        <xs:attribute name="orderID" type="orderIDType" use="required"/>
+        <xs:attribute name="orderBy" type="orderByType" use="required"/>
+    </xs:complexType>
+
+    <!-- Complex Type for 'orders' -->
+    <xs:complexType name="OrdersType">
+        <xs:sequence>
+            <xs:element name="order" type="OrderType" minOccurs="1" maxOccurs="unbounded"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <!-- Complex Type for 'customer' -->
+    <xs:complexType name="CustomerType">
+        <xs:sequence>
+            <xs:element name="name">
+                <xs:complexType>
+                    <xs:simpleContent>
+                        <xs:extension base="xs:string">
+                            <xs:attribute name="title" type="titleType" use="optional"/>
+                        </xs:extension>
+                    </xs:simpleContent>
+                </xs:complexType>
+            </xs:element>
+            <xs:element ref="address"/>
+            <xs:element ref="phone"/>
+            <xs:element ref="email" minOccurs="0"/>
+            <xs:element name="orders" type="OrdersType" minOccurs="0"/>
+        </xs:sequence>
+        <xs:attribute name="custID" type="custIdType" use="required"/>
+    </xs:complexType>
+
+    <!-- Root Element 'customers' -->
+    <xs:element name="customers">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="customer" type="CustomerType" minOccurs="1" maxOccurs="unbounded"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+
+</xs:schema>
